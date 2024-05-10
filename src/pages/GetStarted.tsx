@@ -55,25 +55,27 @@ const GetStarted: React.FC = () => {
     e.preventDefault();
     const validationErrors = validateForm();
     setErrors(validationErrors);
+
     if (Object.keys(validationErrors).length === 0) {
       const form = e.currentTarget;
-      fetch(form.action, {
+      fetch('/f/xkndylqe', {
         method: 'POST',
         body: new FormData(form),
         headers: {
           'Accept': 'application/json'
         }
-      }).then(response => {
+      })
+      .then(response => {
         if (response.ok) {
-          setIsSubmitted(true); // Handle successful submission
-        } else {
-          response.json().then(data => {
-            if (data.error) {
-              console.error(data.error);
-            }
-          });
+          return response.json();
         }
-      }).catch(error => console.error('Error:', error));
+        throw new Error('Network response was not ok.');
+      })
+      .then(data => {
+        console.log(data); // Process your response data here
+        setIsSubmitted(true);
+      })
+      .catch(error => console.error('Error:', error));
     }
   };
 
@@ -92,7 +94,7 @@ const GetStarted: React.FC = () => {
         </div>
         <div className="col-12 col-md-6 px-md-10 pb-5">
           <div className="card p-4 shadow animate__animated animate__zoomIn">
-            <form action="https://formspree.io/f/xkndylqe" method="POST" onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="form-group">
                 <label htmlFor="user_name">Full Name</label>
                 <input type="text" className="form-control" id="user_name" name="user_name" value={formValues.user_name} onChange={e => setFormValues({ ...formValues, user_name: e.target.value })} />
